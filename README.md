@@ -14,3 +14,18 @@ Exemplo: uma fintech quer saber, com base nos hábitos de uso e histórico de pa
 
 ## Objetivo
  construir, em grupo, um MVP (mínimo produto viável) capaz de prever se um cliente vai cancelar e disponibilizar essa previsão via uma API funcional.
+
+## Entregáveis desejados
+
+Notebook (Jupyter/Colab) do time de Data Science, contendo:
+
+Exploração e limpeza dos dados (EDA);
+
+Engenharia de features (ex.: tempo de uso, frequência de login, histórico de pagamento);
+
+Treinamento de modelo supervisionado (ex.: Logistic Regression, Random Forest);
+
+Métricas de desempenho (Acurácia, Precisão, Recall, F1-score);
+
+Serialização do modelo (joblib/pickle).
+
