@@ -29,3 +29,31 @@ Métricas de desempenho (Acurácia, Precisão, Recall, F1-score);
 
 Serialização do modelo (joblib/pickle).
 
+## Contrato de integração (JSON)
+
+Recomendamos definir o contrato de integração logo no início do hackathon. Segue um exemplo:
+
+Entrada:
+
+{
+
+"tempo_contrato_meses": 12,
+
+"atrasos_pagamento": 2,
+
+"uso_mensal": 14.5,
+
+"plano": "Premium"
+
+}
+
+Saída:
+
+{
+
+"previsao": "Vai cancelar",
+
+"probabilidade": 0.81
+
+}
+
