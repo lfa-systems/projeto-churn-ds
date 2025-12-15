@@ -12,3 +12,5 @@ O objetivo é que o time de Data Science desenvolva um modelo preditivo e que o 
 
 Exemplo: uma fintech quer saber, com base nos hábitos de uso e histórico de pagamento, quais clientes têm alta probabilidade de evasão. Com essa informação, o time de marketing pode oferecer serviços personalizados e o time de suporte pode agir preventivamente.
 
+## Objetivo
+ construir, em grupo, um MVP (mínimo produto viável) capaz de prever se um cliente vai cancelar e disponibilizar essa previsão via uma API funcional.
