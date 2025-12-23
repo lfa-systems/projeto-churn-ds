@@ -13,7 +13,7 @@
 * `OnlineSecurity`: assinatura adicional de segurança online 
 * `OnlineBackup`: assinatura adicional de backup online 
 * `DeviceProtection`: assinatura adicional de proteção no dispositivo 
-* `TechSupport`: assinatura adicional de suporte técnico, menos tempo de espera
+* `TechSupport`: assinatura adicional de suporte técnico| menos tempo de espera
 * `StreamingTV`: assinatura de TV a cabo 
 * `StreamingMovies`: assinatura de streaming de filmes 
 * `Contract`: tipo de contrato
@@ -30,7 +30,7 @@
 | :--- | :--- | :--- | :--- | :--- | 
 | `customerID` | Número de identificação único do cliente. |ID (String) | Único para cada linha. | Não usar na modelagem (remover).|
 | `gender` | Gênero do cliente. | Categórica (Nominal) |"{'Female', 'Male'}"|Pré-processamento: One-Hot Encoding (OHE).|
-| `SeniorCitizen` | Cliente com idade ≥65 anos. | Binária | "{0: Não, 1: Sim}" |"Converter para o formato 0/1, se não estiver assim."|
+| `SeniorCitizen` | Cliente com idade ≥65 anos. | Binária | "{0: Não, 1: Sim}" |"Converter para o formato 0/1| se não estiver assim."|
 | `Partner` | O cliente possui parceiro(a).| Binária | "{'Yes', 'No'}" | OHE. |
 | `Dependents` | O cliente possui dependentes.| Binária|"{'Yes', 'No'}"|OHE.|
 | `tenure` | Meses de contrato do cliente com a empresa.| Numérica (Discreta)|Intervalo de 0 a 72 (máximo de 6 anos).| StandardScaler.|
@@ -49,7 +49,7 @@
 O One-Hot Encoding (OHE) é uma técnica de pré-processamento essencial em Machine Learning para transformar variáveis categóricas (texto) em um formato numérico que os algoritmos podem processar. É orquestrado pelo objeto ColumnTransformer (do scikit-learn)
 
 ### 🧪 Exemplo Prático (Aplicado ao projeto-churn-ds)
-Usando a variável `InternetService` do dataset, que possui três categorias:
+Usando a variável `InternetService` do dataset| que possui três categorias:
 
 |Cliente|InternetService|
 | :--- | :---|
@@ -57,7 +57,7 @@ Usando a variável `InternetService` do dataset, que possui três categorias:
 | B |Fibra Ótica|
 | C |Não|
 
-### 🔢 Após o OHE, a tabela de features fica assim:
+### 🔢 Após o OHE| a tabela de features fica assim:
 
 |Cliente |InternetService_DSL|InternetService_Fibra_Ótica|InternetService_Não|
 |:---|:---|:---|:---|
@@ -66,7 +66,7 @@ Usando a variável `InternetService` do dataset, que possui três categorias:
 |C|0|0|1|
 
 ## 🔄 O que é o StandardScaler?
-Se o One-Hot Encoding lida com texto, o StandardScaler lida com números.
+Se o One-Hot Encoding lida com texto| o StandardScaler lida com números.
 O StandardScaler é uma ferramenta do scikit-learn (Python) que transforma as variáveis numéricas. 
 Essa transformação é conhecida como padronização Z-score ou normalização Z-score.
 
@@ -79,9 +79,42 @@ Usaremos variáveis numéricas em escalas muito diferentes:
 | `MonthlyCharges` (Cobrança Mensal) | De 20 a 120 |
 | `TotalCharges` (Cobrança Total) | De 0 a $\approx 8600$ |
 
-Se você alimentar essas colunas diretamente em modelos como Regressão Logística, K-Nearest Neighbors (KNN) ou Redes Neurais, **o algoritmo pode dar uma importância desproporcional** à coluna com os valores mais altos, como TotalCharges.
+Se você alimentar essas colunas diretamente em modelos como Regressão Logística| K-Nearest Neighbors (KNN) ou Redes Neurais| **o algoritmo pode dar uma importância desproporcional** à coluna com os valores mais altos| como TotalCharges.
 
-🧪 **Exemplo**: Uma mudança de 1 unidade em `TotalCharges` (8600 $\rightarrow$ 8601) seria interpretada como muito mais significativa do que uma mudança de 1 unidade em `tenure` (3 $\rightarrow$ 4), mesmo que a mudança no `tenure` seja mais relevante para prever o Churn.
+🧪 **Exemplo**: Uma mudança de 1 unidade em `TotalCharges` (8600 $\rightarrow$ 8601) seria interpretada como muito mais significativa do que uma mudança de 1 unidade em `tenure` (3 $\rightarrow$ 4)| mesmo que a mudança no `tenure` seja mais relevante para prever o Churn.
+
+
+## 🔄 Tabela de Tradução: CSV Original vs. Estrutura do Modelo
+
+|Coluna no CSV Original|Tipo no CSV|O que virou no Modelo (Dicionário)|Regra de Transformação|
+|---|---|---|---|
+|**customerID**|object|(Removido)|Identidade não importa para o comportamento.|
+|**gender**|object|gender_Male|"1 se for Homem| 0 se for Mulher."|
+|**SeniorCitizen**|int64|SeniorCitizen|Já é 0 ou 1 (Mantido).|
+|**Partner**|object|Partner_Yes|"""Yes"" vira 1| ""No"" vira 0."|
+|**Dependents**|object|Dependents_Yes|"""Yes"" vira 1| ""No"" vira 0."|
+|**tenure**|int64|tenure|Número de meses (Mantido).|
+|**PhoneService**|object|PhoneService_Yes|"""Yes"" vira 1| ""No"" vira 0."|
+|**MultipleLines**|object|MultipleLines_Yes|"""Yes"" vira 1| ""No"" vira 0."|
+|**InternetService**|object|InternetService_Fiber optic|"Se for ""Fiber optic"" vira 1."|
+|**InternetService**|object|InternetService_No|Se não tiver internet vira 1.|
+|**OnlineSecurity**|object|OnlineSecurity_Yes|"""Yes"" vira 1| o resto vira 0."|
+|**OnlineBackup**|object|OnlineBackup_Yes|"""Yes"" vira 1| o resto vira 0."|
+|**DeviceProtection**|object|DeviceProtection_Yes|"""Yes"" vira 1| o resto vira 0."|
+|**TechSupport**|object|TechSupport_Yes|"""Yes"" vira 1| o resto vira 0."|
+|**StreamingTV**|object|StreamingTV_Yes|"""Yes"" vira 1| o resto vira 0."|
+|**StreamingMovies**|object|StreamingMovies_Yes|"""Yes"" vira 1| o resto vira 0."|
+|**Contract**|object|Contract_One year|Se for contrato de 1 ano vira 1.|
+|**Contract**|object|Contract_Two year|Se for contrato de 2 anos vira 1.|
+|**PaperlessBilling**|object|PaperlessBilling_Yes|"""Yes"" vira 1| ""No"" vira 0."|
+|**PaymentMethod**|object|PaymentMethod_Electronic check|Se pagar com cheque eletrônico vira 1.|
+|**PaymentMethod**|object|PaymentMethod_Mailed check|Se pagar com cheque via correio vira 1.|
+|**PaymentMethod**|object|PaymentMethod_Credit card (automatic)|Se for cartão automático vira 1.|
+|**MonthlyCharges**|float64|MonthlyCharges|Valor mensal (Mantido).|
+|**TotalCharges**|object|TotalCharges|Convertido de Texto para Número.|
+|**Churn**|object|y_train / y_test|O gabarito que o robô tenta adivinhar.|
+
+
 
 ---
 ## 📜 Informações do Documento
