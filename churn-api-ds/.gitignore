@@ -1,0 +1,5 @@
+.venv/
+api_audit.log
+__pycache__/
+build/
+dist/

@@ -1,0 +1,14 @@
+echo
+
+curl -X POST "http://localhost:8000/predict" \
+     -H "Content-Type: application/json" \
+     -H "Authorization: Bearer token-luciano-123" \
+     -d '{
+           "tempoContratoMeses": 12,
+           "atrasosDePagamento": 2,
+           "usoMensal": 14.5,
+           "plano": "Premium"
+         }'
+
+echo
+echo
