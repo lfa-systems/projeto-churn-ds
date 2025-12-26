@@ -4,7 +4,7 @@ Este projeto utiliza técnicas de **Machine Learning** para identificar clientes
 
 ## 📂 Estrutura do Repositório
 
-* **`./Projeto/`**: Diretório principal.
+* **`./projeto-churn-ds/`**: Diretório principal.
     * **`churn-api-ds/`**: Contém o código-fonte da API, scripts de compilação e executáveis.
     * **`Dados/`**: Base de dados original em CSV utilizada para o treinamento.
     * **`Hackathon_ONE_8.ipynb`**: Notebook Jupyter com a análise exploratória, tratamento de dados e treinamento do modelo.
@@ -97,16 +97,54 @@ Para entender o treinamento, abra o arquivo `.ipynb`. Para rodar o sistema de pr
    
 ### 2. Rodando a API (Servidor de Predição)
 
-    Se deseja colocar o modelo para trabalhar:
-    
+Se deseja colocar o modelo para trabalhar:
+
     Bash#
     
     # Entre na pasta da API
-    cd Projeto/churn-api-ds
+    cd projeto-churn-ds/churn-api-ds
 
     # Execute o servidor
     python run_server.py
 
 Acesse http://localhost:8000 para abrir a interface de cadastro e testar novos clientes.
 
-📊 Matriz de Resultados (O que os números dizem)Para quem prefere ver o "placar" do jogo, aqui está como o modelo se comportou com os 1.407 clientes de teste:Realidade \ PrevisãoPreviu: FICAPreviu: SAICliente FICOU733 (Acerto)300 (Alarme Falso)Cliente SAIU78 (Não detectado)296 (Acerto Crítico)Nota: Perceba que o modelo prefere dar um "Alarme Falso" (300) do que deixar um cliente sair sem aviso (apenas 78). Essa é a nossa estratégia de Recall de 79% em ação!🏗️ Dica para o diretório churn-api-dsComo você tem uma pasta build e arquivos .spec, o seu README de lá já menciona o executável. Isso é ótimo! Mostra que o projeto está pronto para sair da máquina do desenvolvedor e ir para um servidor real.O seu projeto está completíssimo agora! Ele tem:Dados reais filtrados.Modelo inteligente com foco em negócio (Recall).API robusta com tratamentos de erros (try/except).Documentação profissional (READMEs).
+## O BODY da requisição de ser:
+
+Simular um cliente
+
+    cliente_teste = {
+        'tenure': 60,
+        'MonthlyCharges': 25.00,
+        'TotalCharges': 100.80,
+        'gender_Male': 1,
+        'Partner_Yes': 0,
+        'Dependents_Yes': 0,
+        'PhoneService_Yes': 1,
+        'MultipleLines_Yes': 0,
+        'InternetService_Fiber optic': 0,
+        'InternetService_No': 0,
+        'OnlineSecurity_Yes': 1,
+        'OnlineBackup_Yes': 0,
+        'DeviceProtection_Yes': 0,
+        'TechSupport_Yes': 0,
+        'StreamingTV_Yes': 0,
+        'StreamingMovies_Yes': 0,
+        'Contract_One year': 0,
+        'Contract_Two year': 1,
+        'PaperlessBilling_Yes': 1,
+        'PaymentMethod_Credit card (automatic)': 0,
+        'PaymentMethod_Electronic check': 1,
+        'PaymentMethod_Mailed check': 0
+    }
+
+## 📊 Matriz de Resultados (O que os números dizem)
+
+Para quem prefere ver o "placar" do jogo, aqui está como o modelo se comportou com os 1.407 clientes de teste:
+
+    Realidade\Previsão  Previu FICA           Previu: SAI
+    Cliente FICOU       733 (Acerto)          300 (Alarme Falso)
+    Cliente SAIU        78 (Não detectado)    296 (Acerto Crítico)
+
+Nota: Perceba que o modelo prefere dar um "Alarme Falso" (300) do que deixar um cliente sair sem aviso (apenas 78). 
+
