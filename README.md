@@ -153,3 +153,12 @@ Para quem prefere ver o "placar" do jogo, aqui está como o modelo se comportou 
 
 Nota: Perceba que o modelo prefere dar um "Alarme Falso" (300) do que deixar um cliente sair sem aviso (apenas 78). 
 
+---
+## 📜 Informações do Documento
+
+| Campo | Detalhe |
+| :--- | :--- |
+| **Autor Principal** | Luciano Azevedo |
+| **Data da Criação** | 26 de Dezembro de 2025 |
+| **Última Atualização** | 26 de Dezembro de 2025 |
+| **Versão** | 1.0 |
