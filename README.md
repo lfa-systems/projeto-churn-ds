@@ -111,6 +111,9 @@ Se deseja colocar o modelo para trabalhar:
 
 Acesse http://localhost:8000 para abrir a interface de cadastro e testar novos clientes.
 
+## Autenticação
+Observsar os usuarios / token no arquivo `/chrun-api-ds/usuarios.json` para enviar no cabeçalho da requisição.
+
 ## O BODY da requisição de ser:
 
 Simular um cliente
