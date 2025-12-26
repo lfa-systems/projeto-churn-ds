@@ -11,6 +11,8 @@ Este projeto utiliza técnicas de **Machine Learning** para identificar clientes
 
 ## 🧠 O Modelo
 O modelo utiliza **Regressão Logística** com ajuste de `class_weight='balanced'` para lidar com o desequilíbrio das classes. 
+## Diz para o modelo
+    "Ei, prestar atenção em quem sai é muito mais importante! Cada vez que você errar um cliente que cancelou, a sua 'multa' será muito maior do que se você errar um cliente que ficou."
 
 ### Métricas Alcançadas:
 * **Recall (Classe 1):** ~80% (Foco em não deixar nenhum cliente em risco escapar).
