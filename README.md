@@ -11,8 +11,18 @@ Este projeto utiliza técnicas de **Machine Learning** para identificar clientes
 
 ## 🧠 O Modelo
 
+### 🤖 Ciclo de Vida do Modelo
+
+1. **Treinamento (Colab):** O arquivo `projeto_churn.ipynb` processa os dados, trata o desbalanceamento com `class_weight='balanced'` e exporta a inteligência do sistema.
+2. **Exportação:** Ao final do treino, são gerados 3 arquivos:
+   - `model_churn.pkl` (O modelo)
+   - `scaler.pkl` (A régua de normalização)
+   - `model_columns.pkl` (A ordem oficial das colunas)
+3. **Produção (API):** Estes arquivos devem ser colocados na pasta `churn-api-ds` para que o servidor local possa realizar as predições com os mesmos parâmetros do treinamento.
+
+
 O modelo utiliza **Regressão Logística** com ajuste de `class_weight='balanced'` para lidar com o desequilíbrio das classes. 
-### `class_weight='balanced'` Diz para o modelo
+#### `class_weight='balanced'` Diz para o modelo
     "Como o dataset tem muito mais gente que FICOU do que gente que SAIU, o modelo
     tende a ficar 'viciado/preguiçoso' em dizer que todo mundo fica (afinal, assim
     ele acerta quase sempre).
