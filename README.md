@@ -7,15 +7,19 @@ Este projeto utiliza técnicas de **Machine Learning** para identificar clientes
 * **`./projeto-churn-ds/`**: Diretório principal.
     * **`churn-api-ds/`**: Contém o código-fonte da API, modelos treinados, scripts de compilação.
     * **`Dados/`**: Base de dados original em CSV utilizada para o treinamento.
-    * **`Hackathon_ONE_8.ipynb`**: Notebook Jupyter com a análise exploratória, tratamento de dados e treinamento e criação do modelo.
+    * **`Hackathon_ONE_8.ipynb`**: Notebook Jupyter com a análise exploratória, tratamento de dados, treinamento e criação do modelo.
 
 ## 🧠 O Modelo
 
 O modelo utiliza **Regressão Logística** com ajuste de `class_weight='balanced'` para lidar com o desequilíbrio das classes. 
 ### `class_weight='balanced'` Diz para o modelo
-    "Como o dataset tem muito mais gente que FICOU do que gente que SAIU, o modelo tende a ficar 'viciado/preguiçoso' em dizer que todo mundo fica (afinal, assim ele acerta quase sempre).
+    "Como o dataset tem muito mais gente que FICOU do que gente que SAIU, o modelo
+    tende a ficar 'viciado/preguiçoso' em dizer que todo mundo fica (afinal, assim
+    ele acerta quase sempre).
 
-    O balanced chega e dá um sacode: 'Ei, não me venha com o caminho mais fácil! Acertar quem sai vale 10 pontos, e acertar quem fica vale só 1. Agora vira esse jogo!'"
+    O balanced chega e dá um sacode: 'Ei, não me venha com o caminho mais fácil!
+    Acertar quem sai vale 10 pontos, e acertar quem fica vale só 1.
+    Agora vira esse jogo!'"
 
 ### Métricas Alcançadas:
 * **Recall (Classe 1):** ~80% ( Foco em não deixar nenhum cliente em risco escapar ).
