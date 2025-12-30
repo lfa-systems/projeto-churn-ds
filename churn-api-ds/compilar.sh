@@ -25,13 +25,37 @@ case "$1" in
         uvicorn main:app --reload
         ;;
     --build)
-        pyinstaller --onefile --hidden-import=uvicorn.logging --hidden-import=uvicorn.loops.auto --hidden-import=uvicorn.protocols.http.auto --hidden-import=uvicorn.lifespan.on $ENTRY_POINT
+        # Recompile usando o "python -m" (isso garante o uso do seu .venv)
+        python -m PyInstaller --clean --onefile \
+            --hidden-import=uvicorn.logging \
+            --hidden-import=sklearn \
+            --hidden-import=sklearn.utils._cython_blas \
+            --hidden-import=sklearn.neighbors.typedefs \
+            run_server.py
+
+        # Copia os arquivos necessários para a pasta dist
         cp .env usuarios.json dist/ 2>/dev/null
+        cp model_churn.pkl scaler.pkl model_columns.pkl dist/ 2>/dev/null
+        cp main.py dist/ 2>/dev/null
+        echo "[OK] Compilação concluída e arquivos copiados para dist/"
         ;;
     --build-hide)
-        pyinstaller --onefile --noconsole --hidden-import=uvicorn.logging --hidden-import=uvicorn.loops.auto --hidden-import=uvicorn.protocols.http.auto --hidden-import=uvicorn.lifespan.on $ENTRY_POINT
+
+        # Recompile usando o "python -m" (isso garante o uso do seu .venv)
+        python -m PyInstaller --clean --onefile --noconsole\
+            --hidden-import=uvicorn.logging \
+            --hidden-import=sklearn \
+            --hidden-import=sklearn.utils._cython_blas \
+            --hidden-import=sklearn.neighbors.typedefs \
+            run_server.py
+        
+        # Copia os arquivos necessários para a pasta dist
         cp .env usuarios.json dist/ 2>/dev/null
+        cp model_churn.pkl scaler.pkl model_columns.pkl dist/ 2>/dev/null
+        cp main.py dist/ 2>/dev/null
+        echo "[OK] Compilação concluída e arquivos copiados para dist/"
         ;;
+
     --start)
         if [ ! -f "dist/$APP_NAME" ]; then
             echo "[ERRO] Executável não encontrado em dist/. Compile primeiro."

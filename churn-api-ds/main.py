@@ -2,6 +2,9 @@ import os # Permite que Python "converse" com o sistema operacional
 import json # Permite troca de dados na entre sistemas
 import logging # Grava as ações da aplicação no arquivo
 import random # Gera números aleatórios
+import pandas as pd
+import joblib # Carregar o modelo treinado
+
 from datetime import datetime # Acessar o relógio do sistema operacional
 from dotenv import load_dotenv # Importa o carregador de arquivo .env e injetar as variáveis
 from fastapi import FastAPI, Request, Depends, HTTPException, status # Criar APIs
@@ -14,6 +17,10 @@ from pydantic import BaseModel # Definir quais campos o Python deve esperar e va
 # 1. Carrega as variáveis do arquivo .env para o sistema
 load_dotenv()
 
+# Carregamento do Dataset encontrado no link de download RAW (bruto).
+url = 'df_final.csv'
+df = pd.read_csv( url,  sep=',' )
+
 # 2. Captura as variáveis usando os nomes definidos no .env
 APP_TITLE = os.getenv("APP_TITLE")
 USERS_FILE = os.getenv("USERS_JSON_PATH")
@@ -25,6 +32,24 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(message)s'
 )
+
+# CARREGAMENTO DO MODELO E SCALER (Régua Mágica)
+# Certifique-se de que os nomes dos arquivos coincidem com os que você salvou
+try:
+    modelo = joblib.load('model_churn.pkl')
+    scaler = joblib.load('scaler.pkl')
+    colunas_do_modelo = joblib.load('model_columns.pkl') # A lista de nomes e ordem
+    print("✅ Todos os 3 arquivos carregados com sucesso!")
+except Exception as e:
+    print(f"❌ Erro ao carregar arquivos: {e}")
+
+
+# Limites passado para o modelo:
+limites = {
+    'tenure': {'min': int(df['tenure'].min()), 'max': int(df['tenure'].max())},
+    'MonthlyCharges': {'min': float(df['MonthlyCharges'].min()), 'max': float(df['MonthlyCharges'].max())},
+    'TotalCharges': {'min': float(df['TotalCharges'].min()), 'max': float(df['TotalCharges'].max())}
+}
 
 app = FastAPI(title=APP_TITLE) # Criando o "servidor" que vai ouvir as requisições na internet.
 
@@ -39,66 +64,142 @@ app.add_middleware(
 
 security = HTTPBearer()
 
-# Estrutura dos dados que você vai receber
+# Estrutura dos dados à receber. Seus valores padrões.
 class ClienteSchema(BaseModel):
-    tempoContratoMeses: int
-    atrasosDePagamento: int
-    usoMensal: float
-    plano: str
+    tenure: int = 0
+    MonthlyCharges: float = 0
+    TotalCharges: float = 0
+    gender_Male: int = 0
+    Partner_Yes: int = 0
+    Dependents_Yes: int = 0
+    PhoneService_Yes: int = 0
+    MultipleLines_Yes: int = 0
+    InternetService_Fiber_optic: int = 0  # Note: Pydantic troca espaços por _
+    InternetService_No: int = 1
+    OnlineSecurity_Yes: int = 0
+    OnlineBackup_Yes: int = 0
+    DeviceProtection_Yes: int = 0
+    TechSupport_Yes: int = 0
+    StreamingTV_Yes: int = 0
+    StreamingMovies_Yes: int = 0
+    Contract_One_year: int = 0
+    Contract_Two_year: int = 0
+    PaperlessBilling_Yes: int = 0
+    PaymentMethod_Credit_card_automatic: int = 0
+    PaymentMethod_Electronic_check: int = 0
+    PaymentMethod_Mailed_check: int
 
-# --- FUNÇÃO DE CARREGAMENTO USANDO VARIÁVEL DE AMBIENTE ---
+# Mapeamento para lertura correta das colunas conforme o modelo treinado
+MAPA_NOMES_COLUNAS = {
+    "PaymentMethod_Credit_card_automatic": "PaymentMethod_Credit card (automatic)",
+    "PaymentMethod_Bank_transfer_automatic": "PaymentMethod_Bank transfer (automatic)",
+    "PaymentMethod_Mailed_check": "PaymentMethod_Mailed check",
+    "PaymentMethod_Electronic_check": "PaymentMethod_Electronic check",
+    "Contract_One_year": "Contract_One year",
+    "Contract_Two_year": "Contract_Two year",
+    "InternetService_Fiber_optic": "InternetService_Fiber optic"
+}
+
+ # --- FUNÇÕES AUXILIARES ---
 def carregar_usuarios():
     try:
-        # Usamos a variável USERS_FILE que veio do .env
         with open(USERS_FILE, 'r') as f:
             return json.load(f)
-    except FileNotFoundError:
-        logging.error(f"Erro: Arquivo {USERS_FILE} não encontrado!")
+    except:
         return {}
 
-# --- SEGURANÇA E AUDITORIA (Mantendo a lógica anterior) ---
 async def get_current_user(request: Request, credentials: HTTPAuthorizationCredentials = Depends(security)):
     usuarios = carregar_usuarios()
-    token_enviado = credentials.credentials
-    
-    if token_enviado in usuarios:
-        nome_usuario = usuarios[token_enviado]
-        request.state.user_name = nome_usuario
-        return nome_usuario
-    else:
-        request.state.user_name = "ANÔNIMO/INVÁLIDO"
-        raise HTTPException(status_code=401, detail="Token inválido")
+    token = credentials.credentials
+    if token in usuarios:
+        request.state.user_name = usuarios[token]
+        return usuarios[token]
+    request.state.user_name = "ANÔNIMO"
+    raise HTTPException(status_code=401, detail="Token inválido")
 
-@app.middleware("http")
-async def audit_log_middleware(request: Request, call_next):
-    # (A lógica do middleware permanece a mesma, usando LOG_FILE já configurado)
-    response = await call_next(request)
-    user_name = getattr(request.state, "user_name", "DESCONHECIDO")
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    client_host = request.client.host
+# --- ENDPOINTS ---
 
-    log_line = f"[{timestamp}] | {client_host}: {user_name.ljust(20)} | Ação: {request.method} {request.url.path} | Status: {response.status_code}"
-    logging.info(log_line)
-    return response
+@app.get("/metadata")
+async def get_metadata():
+    """Retorna os limites máximos e mínimos para validação no Frontend"""
+    return limites
+
+#def predict(input_data: ClienteSchema):
 
 @app.post("/predict")
-async def predict(dados: ClienteSchema, user: str = Depends(get_current_user)):
-    prob = round(random.uniform(0, 1), 2)
-    res = "Vai cancelar" if prob > 0.5 else "Não vai cancelar"
-    return {"previsao": res, "probabilidade": prob, "cliente_recebido": dados}
+async def predict(input_data: ClienteSchema, user: str = Depends(get_current_user)):
 
-@app.get("/shutdown", dependencies=[Depends(get_current_user)])
-async def shutdown(user: str = Depends(get_current_user)):
-    """
-    Endpoint para desligar o servidor remotamente.
-    Apenas usuários autenticados com token podem fazer isso.
-    """
-    # Verifica se o usuário é um admin (exemplo de lógica extra)
-    if user != "Luciano": # Ou outro critério de admin que você tenha
-        raise HTTPException(status_code=403, detail="Sem permissão para desligar")
+    try:
+        # 1. Converte o Pydantic para dicionário
+        dados = input_data.dict()
 
-    print(f"Desligamento solicitado por {user}")
+        # 2. TRADUÇÃO INTELIGENTE
+        dados_formatados = {}
+        for chave, valor in dados.items():
+            # Tenta tradução específica primeiro, senão faz o replace padrão
+            nova_chave = MAPA_NOMES_COLUNAS.get(chave, chave.replace('_', ' '))
+            dados_formatados[nova_chave] = valor
+        
+        # 3. Cria o DataFrame
+        df = pd.DataFrame([dados_formatados])
+
+        # 4. Alinhamento com model_columns (Garante ordem e TotalCharges)
+        df = df.reindex(columns=colunas_do_modelo, fill_value=0)
+
+        # 5. Escalonamento (Agora o scaler reconhece os nomes!)
+        df_scaled = scaler.transform(df)
+
+        # 6. Predição
+        probabilidades = modelo.predict_proba(df_scaled)[0] # [prob_nao_cancelar, prob_cancelar]
+        classe_predita = modelo.predict(df_scaled)[0]
+        
+        # Pega a probabilidade da classe que o modelo escolheu
+        confianca = probabilidades[classe_predita]
+        
+        res = "Vai cancelar" if classe_predita == 1 else "Não vai cancelar"
+        
+        return {
+            "previsao": res,
+            "probabilidade": float(round(confianca * 100, 2))
+        }
+
+    except Exception as e:
+        return {"detail": f"Erro no processamento: {str(e)}"}
     
-    # Envia um sinal para o próprio processo se encerrar
+
+
+async def predict0(dados: ClienteSchema, user: str = Depends(get_current_user)):
+    try:
+        # A. Converter os dados para DataFrame
+        dados_dict = dados.dict()
+        df_input = pd.DataFrame([dados_dict])
+        
+        # B. ALINHAMENTO DE COLUNAS (O uso do 3º arquivo aqui!)
+        # Isso garante que se o Pydantic mudou o nome (com _) 
+        # ou a ordem, o DataFrame será corrigido para o que o modelo espera.
+        df_input.columns = [c.replace('_', ' ') for c in df_input.columns] # Ex: volta 'Fiber_optic' para 'Fiber optic'
+        df_input = df_input.reindex(columns=colunas_do_modelo, fill_value=0)
+
+        # C. Aplicar a "Régua Mágica" (Scaler)
+        colunas_numericas = ['tenure', 'MonthlyCharges', 'TotalCharges']
+        df_input[colunas_numericas] = scaler.transform(df_input[colunas_numericas])
+
+        # D. Predição
+        probabilidade = modelo.predict_proba(df_input)[0][1]
+        res = "Vai cancelar" if probabilidade > 0.5 else "Não vai cancelar"
+
+        return {"previsao": res, "confianca": f"{round(probabilidade * 100, 2)}%"}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erro no processamento: {str(e)}")
+    
+
+
+
+
+@app.get("/shutdown")
+async def shutdown(user: str = Depends(get_current_user)):
+    if user != "Luciano":
+        raise HTTPException(status_code=403, detail="Acesso negado")
     os.kill(os.getpid(), signal.SIGTERM)
-    return {"message": "Servidor encerrando..."}
+    return {"message": "Desligando..."}
