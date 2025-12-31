@@ -162,6 +162,10 @@ Se deseja colocar o modelo para trabalhar:
 
 Acesse http://localhost:8000/docs para abrir a documentação da api.
 
+
+### Para encerrar o ambiente virtual
+    deactivate
+
 ## Autenticação
 Observsar os usuarios / token no arquivo `/chrun-api-ds/usuarios.json` para enviar no cabeçalho da requisição.
 
