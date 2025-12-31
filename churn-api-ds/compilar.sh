@@ -17,6 +17,13 @@ mostrar_ajuda() {
     exit 0
 }
 
+copiar_arquivos() {
+    cp .env usuarios.json dist/ 2>/dev/null
+    cp model_churn.pkl scaler.pkl model_columns.pkl dist/ 2>/dev/null
+    cp main.py dist/ 2>/dev/null
+    cp df_final.csv dist/ 2>/dev/null
+}
+
 # --- LOGICA DE EXECUÇÃO ---
 
 case "$1" in
@@ -34,9 +41,7 @@ case "$1" in
             run_server.py
 
         # Copia os arquivos necessários para a pasta dist
-        cp .env usuarios.json dist/ 2>/dev/null
-        cp model_churn.pkl scaler.pkl model_columns.pkl dist/ 2>/dev/null
-        cp main.py dist/ 2>/dev/null
+        copiar_arquivos
         echo "[OK] Compilação concluída e arquivos copiados para dist/"
         ;;
     --build-hide)
@@ -50,9 +55,7 @@ case "$1" in
             run_server.py
         
         # Copia os arquivos necessários para a pasta dist
-        cp .env usuarios.json dist/ 2>/dev/null
-        cp model_churn.pkl scaler.pkl model_columns.pkl dist/ 2>/dev/null
-        cp main.py dist/ 2>/dev/null
+        copiar_arquivos
         echo "[OK] Compilação concluída e arquivos copiados para dist/"
         ;;
 
