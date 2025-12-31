@@ -87,7 +87,7 @@ class ClienteSchema(BaseModel):
     PaperlessBilling_Yes: int = 0
     PaymentMethod_Credit_card_automatic: int = 0
     PaymentMethod_Electronic_check: int = 0
-    PaymentMethod_Mailed_check: int
+    PaymentMethod_Mailed_check: int = 0
 
 # Mapeamento para lertura correta das colunas conforme o modelo treinado
 MAPA_NOMES_COLUNAS = {
