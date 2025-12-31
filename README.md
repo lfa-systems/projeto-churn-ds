@@ -139,15 +139,28 @@ Com o Colab aberto, ele deve seguir estes cliques:
 
 Se deseja colocar o modelo para trabalhar:
 
-    Bash#
-    
+### Passo 1: Prepare o ambiente
+
     # Entre na pasta da API
     cd projeto-churn-ds/churn-api-ds
 
-    # Execute o servidor
+    # Crie o ambiente virtual
+    python -m venv .venv
+
+    # Ative o ambiente
+    - No Windows:
+      .venv\Scripts\activate
+    - No Linux/Mac:
+      source .venv/bin/activate
+
+    # Instale as dependências
+    pip install -r requirements.txt
+
+### Passo 2: Execute o servidor
+
     python run_server.py
 
-Acesse http://localhost:8000 para abrir a interface de cadastro e testar novos clientes.
+Acesse http://localhost:8000/docs para abrir a documentação da api.
 
 ## Autenticação
 Observsar os usuarios / token no arquivo `/chrun-api-ds/usuarios.json` para enviar no cabeçalho da requisição.
@@ -180,18 +193,16 @@ Observsar os usuarios / token no arquivo `/chrun-api-ds/usuarios.json` para envi
         "PaymentMethod_Mailed_check": 0
     }
 
-## 📊 Matriz de Resultados (O que os números dizem)
-
-Para quem prefere ver o "placar" do jogo, aqui está como o modelo se comportou com os 1.407 clientes de teste:
-
-    Realidade\Previsão  Previu FICA           Previu: SAI
-    Cliente FICOU       733 (Acerto)          300 (Alarme Falso)
-    Cliente SAIU        78 (Não detectado)    296 (Acerto Crítico)
-
-Nota: Perceba que o modelo prefere dar um "Alarme Falso" (300) do que deixar um cliente sair sem aviso (apenas 78). 
 
 ---
 ## 📜 Informações do Documento
+
+Projeto do Hackathon ONE II - Brasil  
+Para os estudantes Tech Advanced – Grupo 8 do Programa ONE Alura  
+Oracle Next Education Tech Advanced
+
+Projeto conta com a participação da equipe de Back-End  
+Repositótio [GitHub](https://github.com/G0LDB3G/projeto-churn-api)
 
 | Campo | Detalhe |
 | :--- | :--- |
