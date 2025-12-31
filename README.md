@@ -157,14 +157,41 @@ Se deseja colocar o modelo para trabalhar:
     pip install -r requirements.txt
 
 ### Passo 2: Execute o servidor
+Cetifique-se antes que o prefixo (.venv) aparece no seu terminal.  
 
     python run_server.py
 
 Acesse http://localhost:8000/docs para abrir a documentação da api.
 
+## 📦 Como Gerar e Rodar o Executável (Linux)
+Siga estes passos para transformar a API em um binário independente:
 
-### Para encerrar o ambiente virtual
+1. Permissão de Execução  
+Antes de rodar o script pela primeira vez, garanta que ele tem permissão para executar:
+
+    chmod +x compilar.sh
+
+2. Gerar o Binário (Build)  
+Execute o script com a flag --build. Isso usará o PyInstaller para empacotar a aplicação na pasta dist/.
+
+    ./compilar.sh --build
+
+3. Executar o Servidor  
+Após o build, entre na pasta de distribuição e inicie o serviço:
+
+    cd dist/
+    ./run_server
+
+**Nota:** Certifique-se de que os arquivos .pkl (modelo) e o arquivo .env estão presentes na pasta junto com o executável, caso o seu script de compilação não os mova automaticamente.
+
+
+## 🛑 Encerrando o Trabalho
+Quando terminar de usar a API ou o treinamento local, você pode sair do ambiente virtual com o comando:
+
     deactivate
+
+O prefixo (.venv) desaparecerá do seu terminal, indicando que você voltou ao Python global do sistema.
+
 
 ## Autenticação
 Observsar os usuarios / token no arquivo `/chrun-api-ds/usuarios.json` para enviar no cabeçalho da requisição.
