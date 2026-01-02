@@ -51,7 +51,14 @@ limites = {
     'TotalCharges': {'min': float(df['TotalCharges'].min()), 'max': float(df['TotalCharges'].max())}
 }
 
-app = FastAPI(title=APP_TITLE) # Criando o "servidor" que vai ouvir as requisições na internet.
+app = FastAPI(
+    title=APP_TITLE,
+    description="API de Predição de Churn para o Hackathon One",
+    version="1.0.0",
+    openapi_url="/openapi.json", # Caminho interno
+    docs_url="/docs",           # Caminho interno
+    root_path="/python"         # <--- ESTA É A CHAVE!
+    ) # Criando o "servidor" que vai ouvir as requisições na internet.
 
 # Configuração do CORS
 app.add_middleware(
@@ -124,8 +131,6 @@ async def get_metadata():
     """Retorna os limites máximos e mínimos para validação no Frontend"""
     return limites
 
-#def predict(input_data: ClienteSchema):
-
 @app.post("/predict")
 async def predict(input_data: ClienteSchema, user: str = Depends(get_current_user)):
 
@@ -165,37 +170,6 @@ async def predict(input_data: ClienteSchema, user: str = Depends(get_current_use
 
     except Exception as e:
         return {"detail": f"Erro no processamento: {str(e)}"}
-    
-
-
-async def predict0(dados: ClienteSchema, user: str = Depends(get_current_user)):
-    try:
-        # A. Converter os dados para DataFrame
-        dados_dict = dados.dict()
-        df_input = pd.DataFrame([dados_dict])
-        
-        # B. ALINHAMENTO DE COLUNAS (O uso do 3º arquivo aqui!)
-        # Isso garante que se o Pydantic mudou o nome (com _) 
-        # ou a ordem, o DataFrame será corrigido para o que o modelo espera.
-        df_input.columns = [c.replace('_', ' ') for c in df_input.columns] # Ex: volta 'Fiber_optic' para 'Fiber optic'
-        df_input = df_input.reindex(columns=colunas_do_modelo, fill_value=0)
-
-        # C. Aplicar a "Régua Mágica" (Scaler)
-        colunas_numericas = ['tenure', 'MonthlyCharges', 'TotalCharges']
-        df_input[colunas_numericas] = scaler.transform(df_input[colunas_numericas])
-
-        # D. Predição
-        probabilidade = modelo.predict_proba(df_input)[0][1]
-        res = "Vai cancelar" if probabilidade > 0.5 else "Não vai cancelar"
-
-        return {"previsao": res, "confianca": f"{round(probabilidade * 100, 2)}%"}
-
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Erro no processamento: {str(e)}")
-    
-
-
-
 
 @app.get("/shutdown")
 async def shutdown(user: str = Depends(get_current_user)):
