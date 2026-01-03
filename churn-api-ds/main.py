@@ -176,4 +176,4 @@ def shutdown(user: str = Depends(get_current_user)):
     if user != "Luciano":
         raise HTTPException(status_code=403, detail="Acesso negado")
     os.kill(os.getpid(), signal.SIGTERM)
-    return {"message": "Desligando..."}
+    return {"message": "Reiniciando..."}
