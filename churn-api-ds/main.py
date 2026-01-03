@@ -115,7 +115,7 @@ def carregar_usuarios():
     except:
         return {}
 
-async def get_current_user(request: Request, credentials: HTTPAuthorizationCredentials = Depends(security)):
+def get_current_user(request: Request, credentials: HTTPAuthorizationCredentials = Depends(security)):
     usuarios = carregar_usuarios()
     token = credentials.credentials
     if token in usuarios:
@@ -127,12 +127,12 @@ async def get_current_user(request: Request, credentials: HTTPAuthorizationCrede
 # --- ENDPOINTS ---
 
 @app.get("/metadata")
-async def get_metadata():
+def get_metadata():
     """Retorna os limites máximos e mínimos para validação no Frontend"""
     return limites
 
 @app.post("/predict")
-async def predict(input_data: ClienteSchema, user: str = Depends(get_current_user)):
+def predict(input_data: ClienteSchema, user: str = Depends(get_current_user)):
 
     try:
         # 1. Converte o Pydantic para dicionário
@@ -172,7 +172,7 @@ async def predict(input_data: ClienteSchema, user: str = Depends(get_current_use
         return {"detail": f"Erro no processamento: {str(e)}"}
 
 @app.get("/shutdown")
-async def shutdown(user: str = Depends(get_current_user)):
+def shutdown(user: str = Depends(get_current_user)):
     if user != "Luciano":
         raise HTTPException(status_code=403, detail="Acesso negado")
     os.kill(os.getpid(), signal.SIGTERM)
