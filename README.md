@@ -224,6 +224,11 @@ Observsar os usuarios / token no arquivo `/chrun-api-ds/usuarios.json` para envi
         "PaymentMethod_Mailed_check": 0
     }
 
+### A Saída será
+    {
+        "previsao": "Não vai cancelar",
+        "probabilidade": 91.28
+    }
 
 ---
 ## 📜 Informações do Documento
